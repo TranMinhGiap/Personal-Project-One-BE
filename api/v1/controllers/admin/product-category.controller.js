@@ -5,8 +5,13 @@ const paginationHelper = require("../../../../helpers/objectPagination.helper");
 // [GET] /api/v1/product-category
 module.exports.index = async (req, res) => {
   try {
+    const { status } = req.query;
     const condition = {
       deleted: false
+    }
+    // Filter status
+    if(status !== "all"){
+      condition.status = status;
     }
     // Pagination
     const countDocument = await ProductCategory.countDocuments(condition);
