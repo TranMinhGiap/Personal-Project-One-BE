@@ -6,7 +6,7 @@ const searchHelper = require("../../../../helpers/search");
 // [GET] /api/v1/product-category
 module.exports.index = async (req, res) => {
   try {
-    const { status, keyword } = req.query;
+    const { status, keyword, sortKey, sortValue } = req.query;
     const condition = {
       deleted: false
     }
@@ -19,12 +19,18 @@ module.exports.index = async (req, res) => {
       const regKeyword = searchHelper(keyword);
       condition.title = regKeyword;
     }
+    // Sort
+    const sort = {};
+    if(sortKey && sortValue){
+      sort[sortKey] = sortValue;
+    }
     // Pagination
     const countDocument = await ProductCategory.countDocuments(condition);
     const objectPagination = paginationHelper.objectPagination(req.query, countDocument)
     const records = await ProductCategory.find(condition)
       .skip(objectPagination.skip)
-      .limit(objectPagination.limit);
+      .limit(objectPagination.limit)
+      .sort(sort);
     res.json({
       success: true,
       status: 200,
