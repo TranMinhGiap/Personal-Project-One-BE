@@ -11,7 +11,7 @@ module.exports.index = async (req, res) => {
       deleted: false
     }
     // Filter status
-    if(status !== "all"){
+    if(status && status !== "all"){
       condition.status = status;
     }
     // Search

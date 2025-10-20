@@ -1,7 +1,15 @@
 module.exports.objectPagination = (query, totalRecord) => {
   const defaultLimit = 15;
-  let limit = parseInt(query.limit) || defaultLimit;
-  limit = Math.max(1, Math.min(limit, 100)); // giới hạn 1–100
+
+  let rawLimit = parseInt(query.limit);
+  let limit;
+
+  if (rawLimit === 0) {
+    limit = totalRecord; // lấy toàn bộ bản ghi
+  } else {
+    limit = rawLimit || defaultLimit;
+    limit = Math.max(1, Math.min(limit, 100)); // giới hạn từ 1–100
+  }
 
   const totalPage = Math.ceil(totalRecord / limit) || 1;
 
