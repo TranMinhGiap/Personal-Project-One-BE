@@ -1,7 +1,6 @@
 const cloudinary = require('cloudinary').v2;
 const streamifier = require('streamifier');
 
-// Cấu hình Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_KEY,
@@ -9,37 +8,31 @@ cloudinary.config({
 });
 
 module.exports.upload = (req, _, next) => {
-  if (req.file) {
-    let streamUpload = (req) => {
+  if (req.files && req.files.length > 0) { 
+    const uploadPromises = req.files.map(file => {
       return new Promise((resolve, reject) => {
         let stream = cloudinary.uploader.upload_stream(
-          { folder: 'personal-one' }, 
+          { folder: 'personal-one' },
           (error, result) => {
-            if (result) {
-              resolve(result);
-            } else {
-              reject(error);
-            }
+            if (result) resolve(result.secure_url);
+            else reject(error);
           }
         );
-
-        streamifier.createReadStream(req.file.buffer).pipe(stream);
+        streamifier.createReadStream(file.buffer).pipe(stream);
       });
-    };
+    });
 
-    async function upload(req) {
-      try {
-        let result = await streamUpload(req);
-        console.log(result);  // Để debug
-        req.body[req.file.fieldname] = result.secure_url;
-        next();  // Next sau success
-      } catch (error) {
+    Promise.all(uploadPromises)
+      .then(urls => {
+        console.log('Upload success:', urls); // Debug
+        req.body.urls = urls; // Lưu array URLs vào req.body
+        next();
+      })
+      .catch(error => {
         console.error('Upload error:', error);
-        next(error);  // Hoặc res.status(500).json({ error }); nếu là handler
-      }
-    }
-    upload(req);
+        next(error);
+      });
   } else {
-    next();  
+    next();
   }
 };

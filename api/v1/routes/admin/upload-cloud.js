@@ -13,7 +13,7 @@ const controller = require("../../controllers/admin/upload-cloud.controller");
 
 router.post(
   '/',
-  upload.single('upload'),
+  upload.array('upload', 10),
   uploadCloudMiddleware.upload,
   controller.index
 )
