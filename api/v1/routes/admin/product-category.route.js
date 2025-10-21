@@ -9,4 +9,6 @@ const validate = require("../../validates/admin/product-category.validate");
 
 router.get('/', controller.index)
 
+router.post('/create', validate.create, controller.create)
+
 module.exports = router;
