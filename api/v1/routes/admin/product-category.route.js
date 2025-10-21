@@ -13,4 +13,6 @@ router.post('/create', validate.create, controller.create)
 
 router.patch('/edit/:id', validate.edit, controller.edit)
 
+router.delete('/delete/:id', controller.delete)
+
 module.exports = router;
