@@ -13,3 +13,11 @@ module.exports.create = (req, res, next) => {
   }
   next();
 }
+
+module.exports.edit = (req, res, next) => {
+  // Chỉ cần có title là đủ
+  if(!req.body.title){
+    return sendErrorHelper.sendError(res, 400, "Yêu cầu nhập tên danh mục !");
+  }
+  next();
+}

@@ -69,3 +69,36 @@ module.exports.create = async (req, res) => {
     sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);
   }
 }
+
+// [PATCH] /api/v1/product-category/edit/:id
+module.exports.edit = async (req, res) => {
+  try {
+    // Nếu không có vị trí => tự động tăng theo số lượng bản khi. Ngược lại có vị trí => Chuyển dạng số và giữ nguyên vị trí
+    if (!req.body.position) {
+      const countCategory = await ProductCategory.countDocuments();
+      req.body.position = countCategory + 1;
+    } else {
+      req.body.position = parseInt(req.body.position);
+    }
+    // Lưu thong tin người cập nhật
+    const updatedBy = {
+      account_id: req.user.id,
+      updatedAt: new Date()
+    };
+    // Cập nhật
+    await ProductCategory.updateOne(
+      { _id: req.params.id },
+      {
+        ...req.body,
+        $push: { updatedBy: updatedBy }
+      }
+    )
+    res.json({
+      success: true,
+      status: 200,
+      message: "Cập nhật danh mục sản phẩm thành công !",
+    });
+  } catch (error) {
+    sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);
+  }
+}

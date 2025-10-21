@@ -11,4 +11,6 @@ router.get('/', controller.index)
 
 router.post('/create', validate.create, controller.create)
 
+router.patch('/edit/:id', validate.edit, controller.edit)
+
 module.exports = router;
