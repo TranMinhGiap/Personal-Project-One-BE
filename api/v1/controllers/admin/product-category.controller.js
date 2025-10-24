@@ -103,7 +103,7 @@ module.exports.edit = async (req, res) => {
   }
 }
 
-// [PATCH] /api/v1/product-category/edit/:id
+// [PATCH] /api/v1/product-category/change-position/:id
 module.exports.changePosition = async (req, res) => {
   try {
     // convert vị trí thành số trong trường hợp là string
@@ -125,6 +125,32 @@ module.exports.changePosition = async (req, res) => {
       success: true,
       status: 200,
       message: "Cập nhật vị trí danh mục sản phẩm thành công !",
+    });
+  } catch (error) {
+    sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);
+  }
+}
+
+// [PATCH] /api/v1/product-category/change-status/:id
+module.exports.changeStatus = async (req, res) => {
+  try {
+    // Lưu thong tin người cập nhật
+    const updatedBy = {
+      account_id: req.user.id,
+      updatedAt: new Date()
+    };
+    // Cập nhật
+    await ProductCategory.updateOne(
+      { _id: req.params.id },
+      {
+        status: req.body.status,
+        $push: { updatedBy: updatedBy }
+      }
+    )
+    res.json({
+      success: true,
+      status: 200,
+      message: "Cập nhật trạng thái danh mục sản phẩm thành công !",
     });
   } catch (error) {
     sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);

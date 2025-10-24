@@ -15,6 +15,8 @@ router.patch('/edit/:id', validate.edit, controller.edit)
 
 router.patch('/change-position/:id', validate.changePosition, controller.changePosition)
 
+router.patch('/change-status/:id', validate.changeStatus, controller.changeStatus)
+
 router.delete('/delete/:id', controller.delete)
 
 module.exports = router;
