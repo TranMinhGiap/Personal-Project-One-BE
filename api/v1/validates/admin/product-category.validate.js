@@ -21,3 +21,15 @@ module.exports.edit = (req, res, next) => {
   }
   next();
 }
+
+module.exports.changePosition = (req, res, next) => {
+  // chấp nhận số / chuỗi số nguyên
+  if(!req.body.position){
+    return sendErrorHelper.sendError(res, 400, "Chưa có vị trí muốn cập nhật !");
+  }
+  const pos = Number(req.body.position);
+  if(isNaN(pos) || !Number.isInteger(pos)){
+    return sendErrorHelper.sendError(res, 400, "Vị trí cập nhật phải là số nguyên !");
+  }
+  next();
+}

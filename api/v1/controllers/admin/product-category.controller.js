@@ -103,6 +103,34 @@ module.exports.edit = async (req, res) => {
   }
 }
 
+// [PATCH] /api/v1/product-category/edit/:id
+module.exports.changePosition = async (req, res) => {
+  try {
+    // convert vị trí thành số trong trường hợp là string
+    req.body.position = parseInt(req.body.position);
+    // Lưu thong tin người cập nhật
+    const updatedBy = {
+      account_id: req.user.id,
+      updatedAt: new Date()
+    };
+    // Cập nhật
+    await ProductCategory.updateOne(
+      { _id: req.params.id },
+      {
+        position: req.body.position,
+        $push: { updatedBy: updatedBy }
+      }
+    )
+    res.json({
+      success: true,
+      status: 200,
+      message: "Cập nhật vị trí danh mục sản phẩm thành công !",
+    });
+  } catch (error) {
+    sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);
+  }
+}
+
 // [DELETE] /api/v1/product-category/delete/:id
 module.exports.delete = async (req, res) => {
   try {
