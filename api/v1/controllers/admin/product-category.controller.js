@@ -157,6 +157,49 @@ module.exports.changeStatus = async (req, res) => {
   }
 }
 
+// [PATCH] /api/v1/product-category/change-multi
+module.exports.changeMulti = async (req, res) => {
+  try {
+    const type = req.body.type;
+    const ids = req.body.ids;
+    // Lưu thong tin người cập nhật
+    const updatedBy = {
+      account_id: req.user.id,
+      updatedAt: new Date()
+    };
+    // Cập nhật
+    switch (type) {
+      case "active":
+        await ProductCategory.updateMany({ _id: { $in : ids } }, {
+          status: "active",
+          $push: { updatedBy: updatedBy }
+        });
+        break;
+      case "inactive":
+        await ProductCategory.updateMany({ _id: { $in : ids } }, {
+          status: "inactive",
+          $push: { updatedBy: updatedBy }
+        });
+        break;
+      case "deleted-all":
+        await ProductCategory.updateMany({ _id: { $in : ids } }, {
+          deleted: "true",
+          $push: { updatedBy: updatedBy }
+        });
+        break;
+      default:
+        break;
+    }
+    res.json({
+      success: true,
+      status: 200,
+      message: "Cập nhật trạng thái danh mục sản phẩm thành công !",
+    });
+  } catch (error) {
+    sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);
+  }
+}
+
 // [DELETE] /api/v1/product-category/delete/:id
 module.exports.delete = async (req, res) => {
   try {

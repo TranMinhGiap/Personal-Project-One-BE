@@ -17,6 +17,8 @@ router.patch('/change-position/:id', validate.changePosition, controller.changeP
 
 router.patch('/change-status/:id', validate.changeStatus, controller.changeStatus)
 
+router.patch('/change-multi', validate.changeMulti, controller.changeMulti)
+
 router.delete('/delete/:id', controller.delete)
 
 module.exports = router;
