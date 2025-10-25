@@ -2,6 +2,7 @@ const ProductCategory = require('../../models/product-category.modal');
 const sendErrorHelper = require('../../../../helpers/sendError.helper');
 const paginationHelper = require("../../../../helpers/objectPagination.helper");
 const searchHelper = require("../../../../helpers/search");
+const userLogHelper = require('../../../../helpers/attachUserLog');
 
 // [GET] /api/v1/product-category
 module.exports.index = async (req, res) => {
@@ -220,6 +221,38 @@ module.exports.delete = async (req, res) => {
       success: true,
       status: 200,
       message: "Xóa danh mục sản phẩm thành công !",
+    });
+  } catch (error) {
+    sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);
+  }
+}
+
+// [GET] /api/v1/product-category/detail/:id
+module.exports.detail = async (req, res) => {
+  try {
+    const record = await ProductCategory.findOne({ _id: req.params.id, deleted: false }).lean();
+    if(!record){
+      return sendErrorHelper.sendError(res, 400, "Không tìm thấy danh mục", error.message);
+    }
+    // Lấy danh mục cha
+    if (record.parent_id) {
+      try {
+        const infoCategoryParent = await ProductCategory.findOne({ _id: record.parent_id, deleted: false });
+        record.infoCategoryParent = infoCategoryParent || null;
+      } catch (error) {
+        record.infoCategoryParent = null;
+        console.error(`[Error - Danh mục cha]: ${error.message}`);
+      }
+    } else {
+      record.infoCategoryParent = null;
+    }
+    // Có danh mục thì gán thêm 1 số thông tin (User thêm sửa xóa)
+    const newRecord = await userLogHelper(record);
+    res.json({
+      success: true,
+      status: 200,
+      message: "Lấy mục sản phẩm thành công !",
+      data: newRecord
     });
   } catch (error) {
     sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);

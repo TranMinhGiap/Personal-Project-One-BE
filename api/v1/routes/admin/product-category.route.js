@@ -21,4 +21,6 @@ router.patch('/change-multi', validate.changeMulti, controller.changeMulti)
 
 router.delete('/delete/:id', controller.delete)
 
+router.get('/detail/:id', controller.detail)
+
 module.exports = router;
