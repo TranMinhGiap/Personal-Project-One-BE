@@ -133,6 +133,32 @@ module.exports.changeStatus = async (req, res) => {
   }
 }
 
+// [PATCH] /api/v1/admin/roles/edit/:id
+module.exports.edit = async (req, res) => {
+  try {
+    // Lưu thong tin người cập nhật
+    const updatedBy = {
+      account_id: req.user.id,
+      updatedAt: new Date()
+    };
+    // Cập nhật
+    await Role.updateOne(
+      { _id: req.params.id },
+      {
+        ...req.body,
+        $push: { updatedBy: updatedBy }
+      }
+    )
+    res.json({
+      success: true,
+      status: 200,
+      message: "Cập nhật nhóm quyền thành công !",
+    });
+  } catch (error) {
+    sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);
+  }
+}
+
 // [DELETE] /api/v1/admin/roles/delete/:id
 module.exports.delete = async (req, res) => {
   try {

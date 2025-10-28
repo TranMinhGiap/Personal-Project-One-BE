@@ -27,7 +27,6 @@ module.exports.changeMulti = (req, res, next) => {
   next();
 }
 
-
 module.exports.changeStatus = (req, res, next) => {
   // nhận kiểm tra có status hay không
   if(!req.body.status){
@@ -36,6 +35,14 @@ module.exports.changeStatus = (req, res, next) => {
   // Nếu có phải là 1 trong 2 giá trị "active" hoặc "inactive"
   if(!['active', 'inactive'].includes(req.body.status)){
     return sendErrorHelper.sendError(res, 400, "Giá trị cập nhật không hợp lệ !");
+  }
+  next();
+}
+
+module.exports.edit = (req, res, next) => {
+  // Chỉ cần có title là đủ
+  if(!req.body.title){
+    return sendErrorHelper.sendError(res, 400, "Yêu cầu nhập tên nhóm quyền !");
   }
   next();
 }
