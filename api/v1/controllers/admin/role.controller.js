@@ -133,6 +133,32 @@ module.exports.changeStatus = async (req, res) => {
   }
 }
 
+// [DELETE] /api/v1/admin/roles/delete/:id
+module.exports.delete = async (req, res) => {
+  try {
+    // Lưu thông tin người xóa
+    const infoDelete = {
+      account_id: req.user.id,
+      deletedAt: new Date()
+    }
+    // Xóa mềm
+    await Role.updateOne(
+      { _id: req.params.id },
+      {
+        deleted: true,
+        deletedBy: infoDelete
+      }
+    )
+    res.json({
+      success: true,
+      status: 200,
+      message: "Xóa danh mục sản phẩm thành công !",
+    });
+  } catch (error) {
+    sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);
+  }
+}
+
 // [GET] /api/v1/admin/roles/detail/:id
 module.exports.detail = async (req, res) => {
   try {
