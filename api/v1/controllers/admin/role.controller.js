@@ -106,3 +106,30 @@ module.exports.changeMulti = async (req, res) => {
     sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);
   }
 }
+
+
+// [PATCH] /api/v1/admin/roles/change-status/:id
+module.exports.changeStatus = async (req, res) => {
+  try {
+    // Lưu thong tin người cập nhật
+    const updatedBy = {
+      account_id: req.user.id,
+      updatedAt: new Date()
+    };
+    // Cập nhật
+    await Role.updateOne(
+      { _id: req.params.id },
+      {
+        status: req.body.status,
+        $push: { updatedBy: updatedBy }
+      }
+    )
+    res.json({
+      success: true,
+      status: 200,
+      message: "Cập nhật trạng thái nhóm quyền thành công !",
+    });
+  } catch (error) {
+    sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);
+  }
+}
