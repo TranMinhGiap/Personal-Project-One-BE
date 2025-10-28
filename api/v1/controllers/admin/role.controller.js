@@ -44,6 +44,26 @@ module.exports.index = async (req, res) => {
   }
 }
 
+// [POST] /api/v1/admin/role/create
+module.exports.create = async (req, res) => {
+  try {
+    // Lưu thông tin người tạo (thông tin đã có khi chạy qua middleware auth)
+    req.body.createdBy = {
+      account_id: req.user.id
+    }
+    const record = new Role(req.body);
+    await record.save();
+    res.json({
+      success: true,
+      status: 200,
+      message: "Thêm nhóm quyền thành công !",
+      data: record
+    });
+  } catch (error) {
+    sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);
+  }
+}
+
 // [PATCH] /api/v1/admin/role/change-multi
 module.exports.changeMulti = async (req, res) => {
   try {

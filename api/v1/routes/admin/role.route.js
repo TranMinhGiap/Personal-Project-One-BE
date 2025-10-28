@@ -9,6 +9,8 @@ const validate = require("../../validates/admin/role.validate");
 
 router.get('/', controller.index)
 
+router.post('/create', validate.create, controller.create)
+
 router.patch('/change-multi', validate.changeMulti, controller.changeMulti)
 
 module.exports = router;

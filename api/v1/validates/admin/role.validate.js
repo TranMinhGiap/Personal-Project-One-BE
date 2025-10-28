@@ -1,5 +1,16 @@
 const sendErrorHelper = require('../../../../helpers/sendError.helper');
 
+module.exports.create = (req, res, next) => {
+  if(!req.body.title){
+    return sendErrorHelper.sendError(res, 400, "Yêu cầu nhập tên nhóm quyền !");
+  }
+  if(!req.body.status || !["active", "inactive"].includes(req.body.status)){
+    // model đã có enum rồi không cần cũng được !
+    return sendErrorHelper.sendError(res, 400, "Yêu cầu cung cấp trạng thái !");
+  }
+  next();
+}
+
 module.exports.changeMulti = (req, res, next) => {
   // nhận kiểm tra có type hay không
   if(!req.body.type){
