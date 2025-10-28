@@ -22,8 +22,10 @@ module.exports.index = async (req, res) => {
     }
     // Sort
     const sort = {};
-    if(sortKey && sortValue){
+    if (sortKey && sortValue) {
       sort[sortKey] = sortValue;
+    } else {
+      sort.position = "asc";
     }
     // Pagination
     const countDocument = await ProductCategory.countDocuments(condition);
