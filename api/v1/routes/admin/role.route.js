@@ -15,4 +15,6 @@ router.patch('/change-multi', validate.changeMulti, controller.changeMulti)
 
 router.patch('/change-status/:id', validate.changeStatus, controller.changeStatus)
 
+router.get('/detail/:id', controller.detail)
+
 module.exports = router;

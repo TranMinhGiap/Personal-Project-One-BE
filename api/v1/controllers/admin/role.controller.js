@@ -2,7 +2,7 @@ const Role = require('../../models/role.model');
 const sendErrorHelper = require('../../../../helpers/sendError.helper');
 const paginationHelper = require("../../../../helpers/objectPagination.helper");
 const searchHelper = require("../../../../helpers/search");
-// const userLogHelper = require('../../../../helpers/attachUserLog');
+const userLogHelper = require('../../../../helpers/attachUserLog');
 
 // [GET] /api/v1/admin/roles
 module.exports.index = async (req, res) => {
@@ -107,7 +107,6 @@ module.exports.changeMulti = async (req, res) => {
   }
 }
 
-
 // [PATCH] /api/v1/admin/roles/change-status/:id
 module.exports.changeStatus = async (req, res) => {
   try {
@@ -128,6 +127,26 @@ module.exports.changeStatus = async (req, res) => {
       success: true,
       status: 200,
       message: "Cập nhật trạng thái nhóm quyền thành công !",
+    });
+  } catch (error) {
+    sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);
+  }
+}
+
+// [GET] /api/v1/admin/roles/detail/:id
+module.exports.detail = async (req, res) => {
+  try {
+    const record = await Role.findOne({ _id: req.params.id, deleted: false }).lean();
+    if(!record){
+      return sendErrorHelper.sendError(res, 400, "Không tìm thấy nhóm quyền!", error.message);
+    }
+    // Có nhóm quyền thì gán thêm 1 số thông tin (User thêm sửa xóa)
+    const newRecord = await userLogHelper(record);
+    res.json({
+      success: true,
+      status: 200,
+      message: "Lấy nhóm quyền phẩm thành công !",
+      data: newRecord
     });
   } catch (error) {
     sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);
