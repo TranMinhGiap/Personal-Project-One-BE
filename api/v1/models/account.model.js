@@ -3,9 +3,23 @@ const generate = require("../../../helpers/generate.helper");
 
 const accountSchema = new mongoose.Schema(
   { 
-    fullName: String,
-    email: String,
-    password: String,
+    fullName: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    },
+    password: {
+      type: String,
+      required: true,
+      trim: true
+    },
     token: {
       type: String,
       default: () => generate.generateRandomString(30)
@@ -18,19 +32,41 @@ const accountSchema = new mongoose.Schema(
       }
     },
     deletedBy: {
-      account_id: String,
-      deletedAt: Date
-    },
-    updatedBy: [
-      {
+      type: {
         account_id: String,
-        updatedAt: Date
-      }
-    ],
-    phone: String,
-    avatar: String,
-    role_id: String,
-    status: String,
+        deletedAt: Date
+      },
+      default: null
+    },
+    updatedBy: {
+      type: [
+        {
+          account_id: String,
+          updatedAt: {
+            type: Date,
+            default: Date.now
+          }
+        }
+      ],
+      default: []
+    },
+    phone: {
+      type: String,
+      default: ""
+    },
+    avatar: {
+      type: String,
+      default: ""
+    },
+    role_id: {
+      type: String,
+      required: true
+    },
+    status: {
+      type: String,
+      enum: ['active', 'inactive'], 
+      default: 'active'
+    },
     deleted: {
       type: Boolean,
       default: false
