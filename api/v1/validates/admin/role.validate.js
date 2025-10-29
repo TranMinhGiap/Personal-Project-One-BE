@@ -46,3 +46,13 @@ module.exports.edit = (req, res, next) => {
   }
   next();
 }
+
+module.exports.permissions = (req, res, next) => {
+  if(!req.body){
+    return sendErrorHelper.sendError(res, 400, "Chưa có dữ liệu cập nhật !");
+  }
+  if(!typeof req.body === 'object' || !Array.isArray(req.body.roles)){
+    return sendErrorHelper.sendError(res, 400, "Dữ liệu cập nhật không hợp lệ !");
+  }
+  next();
+}

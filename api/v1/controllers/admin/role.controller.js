@@ -159,6 +159,35 @@ module.exports.edit = async (req, res) => {
   }
 }
 
+// [PATCH] /api/v1/admin/roles/permissions
+module.exports.permissions = async (req, res) => {
+  // danh sách các role cần cập nhật permission
+  try {
+    const rolesUpdate = req.body.roles;
+    // Lưu thong tin người cập nhật
+    const updatedBy = {
+      account_id: req.user.id,
+      updatedAt: new Date()
+    };
+    // Cập nhật
+    for (let role of rolesUpdate) {
+      const id = role.id;
+      const permissions = role.permissions;
+      await Role.updateOne({ _id: id }, {
+        permissions: permissions,
+        $push: { updatedBy: updatedBy }
+      });
+    }
+    res.json({
+      success: true,
+      status: 200,
+      message: "Cập nhật phân quyền thành công !",
+    });
+  } catch (error) {
+    sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);
+  }
+}
+
 // [DELETE] /api/v1/admin/roles/delete/:id
 module.exports.delete = async (req, res) => {
   try {
