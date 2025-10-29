@@ -2,6 +2,7 @@ const Account = require('../../models/account.model');
 const sendErrorHelper = require('../../../../helpers/sendError.helper');
 const paginationHelper = require("../../../../helpers/objectPagination.helper");
 const searchHelper = require("../../../../helpers/search");
+const userLogHelper = require('../../../../helpers/attachUserLog');
 
 // [GET] /apt/v1/admin/accounts
 module.exports.index = async (req, res) => {
@@ -49,16 +50,17 @@ module.exports.index = async (req, res) => {
 module.exports.detail = async (req, res) => {
   try {
     const { id } = req.params;
-    const condition = {
-      _id: id,
-      deleted: false
+    const record = await Account.findOne({ _id: id, deleted: false }).select("-password").lean();
+    if (!record) {
+      return sendErrorHelper.sendError(res, 400, "Không tìm thấy tài khoản", error.message);
     }
-    const records = await Account.findOne(condition).select("-password");
+    // Có tài khoản thì gán thêm 1 số thông tin (User thêm sửa xóa)
+    const newRecord = await userLogHelper(record);
     res.json({
       success: true,
       status: 200,
       message: "Lấy dữ liệu thành công !",
-      data: records,
+      data: newRecord,
     });
   } catch (error) {
     sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);

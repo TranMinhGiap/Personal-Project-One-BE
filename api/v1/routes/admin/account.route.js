@@ -10,7 +10,7 @@ const validate = require("../../validates/admin/account.validate");
 //middleware
 const checkRoleMiddleware = require('../../middlewares/admin/auth.middleware');
 
-router.get('/',  controller.index)
+router.get('/', checkRoleMiddleware.checkRole('account_view'), controller.index)
 
 router.get('/detail/:id', checkRoleMiddleware.checkRole('account_view'), controller.detail)
 
