@@ -1,5 +1,6 @@
 const sendErrorHelper = require("../../../../helpers/sendError.helper");
 const Account = require("../../models/account.model");
+const Role = require('../../models/role.model');
 
 module.exports.requireAuth = async (req, res, next) => {
   try {
@@ -32,3 +33,15 @@ module.exports.requireAuth = async (req, res, next) => {
     return sendErrorHelper.sendError(res, 500, "Internal Server Error", "Lỗi server nội bộ!");
   }
 };
+
+module.exports.checkRole = (permission) => async (req, res, next) => {
+  const role = await Role.findOne({
+    _id: req.user.role_id,
+    status: "active",
+    deleted: false
+  });
+  if(!role || !role.permissions.includes(permission)){
+    return sendErrorHelper.sendError(res, 400, "Không có quyền truy cập");
+  }
+  next();
+}

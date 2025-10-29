@@ -7,20 +7,23 @@ const controller = require("../../controllers/admin/product-category.controller"
 //validate
 const validate = require("../../validates/admin/product-category.validate");
 
-router.get('/', controller.index)
+// middleware
+const checkRoleMiddleware = require('../../middlewares/admin/auth.middleware');
 
-router.post('/create', validate.create, controller.create)
+router.get('/', checkRoleMiddleware.checkRole('products-category_view'), controller.index)
 
-router.patch('/edit/:id', validate.edit, controller.edit)
+router.post('/create', checkRoleMiddleware.checkRole('products-category_create'), validate.create, controller.create)
 
-router.patch('/change-position/:id', validate.changePosition, controller.changePosition)
+router.patch('/edit/:id', checkRoleMiddleware.checkRole('products-category_edit'), validate.edit, controller.edit)
 
-router.patch('/change-status/:id', validate.changeStatus, controller.changeStatus)
+router.patch('/change-position/:id', checkRoleMiddleware.checkRole('products-category_edit'), validate.changePosition, controller.changePosition)
 
-router.patch('/change-multi', validate.changeMulti, controller.changeMulti)
+router.patch('/change-status/:id', checkRoleMiddleware.checkRole('products-category_edit'), validate.changeStatus, controller.changeStatus)
 
-router.delete('/delete/:id', controller.delete)
+router.patch('/change-multi', checkRoleMiddleware.checkRole('products-category_edit'), validate.changeMulti, controller.changeMulti)
 
-router.get('/detail/:id', controller.detail)
+router.delete('/delete/:id', checkRoleMiddleware.checkRole('products-category_delete'), controller.delete)
+
+router.get('/detail/:id', checkRoleMiddleware.checkRole('products-category_view'), controller.detail)
 
 module.exports = router;
