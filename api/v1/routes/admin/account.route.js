@@ -7,8 +7,11 @@ const controller = require("../../controllers/admin/account.controller");
 //validate
 const validate = require("../../validates/admin/account.validate");
 
-router.get('/', controller.index)
+//middleware
+const checkRoleMiddleware = require('../../middlewares/admin/auth.middleware');
 
-router.get('/detail/:id', controller.detail)
+router.get('/',  controller.index)
+
+router.get('/detail/:id', checkRoleMiddleware.checkRole('account_view'), controller.detail)
 
 module.exports = router;
