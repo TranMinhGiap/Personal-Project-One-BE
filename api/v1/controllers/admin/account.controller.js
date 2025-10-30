@@ -160,6 +160,32 @@ module.exports.changeStatus = async (req, res) => {
   }
 }
 
+// [DELETE] /api/v1/product-category/delete/:id
+module.exports.delete = async (req, res) => {
+  try {
+    // Lưu thông tin người xóa
+    const infoDelete = {
+      account_id: req.user.id,
+      deletedAt: new Date()
+    }
+    // Xóa mềm
+    await Account.updateOne(
+      { _id: req.params.id },
+      {
+        deleted: true,
+        deletedBy: infoDelete
+      }
+    )
+    res.json({
+      success: true,
+      status: 200,
+      message: "Xóa tài khoản thành công !",
+    });
+  } catch (error) {
+    sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);
+  }
+}
+
 // [GET] /apt/v1/admin/accounts/detail/:id
 module.exports.detail = async (req, res) => {
   try {
