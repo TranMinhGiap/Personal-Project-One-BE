@@ -3,6 +3,7 @@ const sendErrorHelper = require('../../../../helpers/sendError.helper');
 const paginationHelper = require("../../../../helpers/objectPagination.helper");
 const searchHelper = require("../../../../helpers/search");
 const userLogHelper = require('../../../../helpers/attachUserLog');
+const md5 = require('md5');
 
 // [GET] /apt/v1/admin/accounts
 module.exports.index = async (req, res) => {
@@ -43,6 +44,36 @@ module.exports.index = async (req, res) => {
     });
   } catch (error) {
     sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);
+  }
+}
+
+// [POST] /api/v1/admin/accounts/create
+module.exports.create = async (req, res) => {
+  try {
+    // Kiểm tra xem email tồn tại
+    const emailExit = await Account.findOne({
+      email: req.body.email,
+      deleted: false
+    });
+    if(emailExit){
+      return sendErrorHelper.sendError(res, 400, "Email đã tồn tại trong hệ thống !");
+    }
+    // Mã hóa mật khẩu khi email thỏa mãn
+    req.body.password = md5(req.body.password);
+    // Lưu thông tin người tạo (thông tin đã có khi chạy qua middleware auth)
+    req.body.createdBy = {
+      account_id: req.user.id
+    }
+    const record = new Account(req.body);
+    await record.save();
+    res.json({
+      success: true,
+      status: 200,
+      message: "Thêm tài khoản thành công !",
+      data: record
+    });
+  } catch (error) {
+    sendErrorHelper.sendError(res, 500, "Có lỗi khi thêm mới tài khoản", error.message);
   }
 }
 
