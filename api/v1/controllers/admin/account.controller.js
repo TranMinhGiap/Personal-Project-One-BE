@@ -1,4 +1,5 @@
 const Account = require('../../models/account.model');
+const Role = require('../../models/role.model');
 const sendErrorHelper = require('../../../../helpers/sendError.helper');
 const paginationHelper = require("../../../../helpers/objectPagination.helper");
 const searchHelper = require("../../../../helpers/search");
@@ -34,7 +35,20 @@ module.exports.index = async (req, res) => {
     const records = await Account.find(condition)
       .skip(objectPagination.skip)
       .limit(objectPagination.limit)
-      .sort(sort);
+      .sort(sort)
+      .lean();
+    for(let record of records){
+      // Gán thông tin role
+      if(record.role_id){
+        const role = await Role.findOne({ _id: record.role_id, status: "active", deleted: false }).lean();
+        if(role){
+          record.roleInfo = role;
+        }
+        else{
+          record.roleInfo = null;
+        }
+      }
+    }
     res.json({
       success: true,
       status: 200,
