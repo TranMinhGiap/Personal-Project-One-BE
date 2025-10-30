@@ -14,7 +14,9 @@ router.get('/', checkRoleMiddleware.checkRole('account_view'), controller.index)
 
 router.get('/create', validate.create, controller.create)
 
-router.get('/change-multi', validate.changeMulti, controller.changeMulti)
+router.patch('/change-multi', validate.changeMulti, controller.changeMulti)
+
+router.patch('/change-status/:id', validate.changeStatus, controller.changeStatus)
 
 router.get('/detail/:id', checkRoleMiddleware.checkRole('account_view'), controller.detail)
 

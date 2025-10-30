@@ -37,3 +37,18 @@ module.exports.changeMulti = (req, res, next) => {
   }
   next();
 }
+
+module.exports.changeStatus = (req, res, next) => {
+  if(!req.body){
+    return sendErrorHelper.sendError(res, 400, "Chưa có dữ liệu !");
+  }
+  // nhận kiểm tra có status hay không
+  if(!req.body.status){
+    return sendErrorHelper.sendError(res, 400, "Chưa có trạng thái muốn cập nhật !");
+  }
+  // Nếu có phải là 1 trong 2 giá trị "active" hoặc "inactive"
+  if(!['active', 'inactive'].includes(req.body.status)){
+    return sendErrorHelper.sendError(res, 400, "Giá trị cập nhật không hợp lệ !");
+  }
+  next();
+}
