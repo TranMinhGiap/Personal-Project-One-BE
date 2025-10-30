@@ -14,11 +14,11 @@ module.exports.index = async (req, res) => {
       deleted: false
     }
     // Filter status
-    if(status && status !== "all"){
+    if (status && status !== "all") {
       condition.status = status;
     }
     // Search
-    if(keyword){
+    if (keyword) {
       const regKeyword = searchHelper(keyword);
       condition.fullName = regKeyword;
     }
@@ -37,14 +37,14 @@ module.exports.index = async (req, res) => {
       .limit(objectPagination.limit)
       .sort(sort)
       .lean();
-    for(let record of records){
+    for (let record of records) {
       // Gán thông tin role
-      if(record.role_id){
+      if (record.role_id) {
         const role = await Role.findOne({ _id: record.role_id, status: "active", deleted: false }).lean();
-        if(role){
+        if (role) {
           record.roleInfo = role;
         }
-        else{
+        else {
           record.roleInfo = null;
         }
       }
@@ -69,7 +69,7 @@ module.exports.create = async (req, res) => {
       email: req.body.email,
       deleted: false
     });
-    if(emailExit){
+    if (emailExit) {
       return sendErrorHelper.sendError(res, 400, "Email đã tồn tại trong hệ thống !");
     }
     // Mã hóa mật khẩu khi email thỏa mãn
@@ -91,6 +91,55 @@ module.exports.create = async (req, res) => {
   }
 }
 
+// [PATCH] /api/v1/admin/accounts/edit/:id
+module.exports.edit = async (req, res) => {
+  try {
+    // Kiểm tra xem tài khoản có tồn tại không
+    const exitAccount = await Account.findOne({ _id: req.params.id, deleted: false, status: "active" });
+    if (!exitAccount) {
+      return sendErrorHelper.sendError(res, 400, "Tài khoản không tồn tại !");
+    }
+    // Kiểm tra email có bị trùng không
+    if (req.body.email.trim() !== exitAccount.email) {
+      const emailExit = await Account.findOne({
+        _id: { $ne: req.params.id },
+        email: req.body.email,
+        deleted: false,
+        status: "active"
+      });
+      if (emailExit) {
+        return sendErrorHelper.sendError(res, 400, "Email đã tồn tại trong hệ thống !");
+      }
+    }
+    // Cập nhật mật khẩu nếu có thay đổi
+    if (req.body.password) {
+      req.body.password = md5(req.body.password);
+    } else {
+      delete req.body.password;
+    }
+    // Lưu thông tin người cập nhật
+    const updatedBy = {
+      account_id: req.user.id,
+      updatedAt: new Date()
+    };
+    // Cập nhật
+    await Account.updateOne(
+      { _id: req.params.id },
+      {
+        ...req.body,
+        $push: { updatedBy: updatedBy }
+      }
+    )
+    res.json({
+      success: true,
+      status: 200,
+      message: "Cập nhật tài khoản thành công !",
+    });
+  } catch (error) {
+    sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);
+  }
+}
+
 // [PATCH] /api/v1/amdin/accounts/change-multi
 module.exports.changeMulti = async (req, res) => {
   try {
@@ -104,19 +153,19 @@ module.exports.changeMulti = async (req, res) => {
     // Cập nhật
     switch (type) {
       case "active":
-        await Account.updateMany({ _id: { $in : ids } }, {
+        await Account.updateMany({ _id: { $in: ids } }, {
           status: "active",
           $push: { updatedBy: updatedBy }
         });
         break;
       case "inactive":
-        await Account.updateMany({ _id: { $in : ids } }, {
+        await Account.updateMany({ _id: { $in: ids } }, {
           status: "inactive",
           $push: { updatedBy: updatedBy }
         });
         break;
       case "deleted-all":
-        await Account.updateMany({ _id: { $in : ids } }, {
+        await Account.updateMany({ _id: { $in: ids } }, {
           deleted: "true",
           $push: { updatedBy: updatedBy }
         });
@@ -134,7 +183,7 @@ module.exports.changeMulti = async (req, res) => {
   }
 }
 
-// [PATCH] /api/v1/product-category/change-status/:id
+// [PATCH] /api/v1/admin/accounts/change-status/:id
 module.exports.changeStatus = async (req, res) => {
   try {
     // Lưu thong tin người cập nhật
@@ -160,7 +209,7 @@ module.exports.changeStatus = async (req, res) => {
   }
 }
 
-// [DELETE] /api/v1/product-category/delete/:id
+// [DELETE] /api/v1/admin/accounts/delete/:id
 module.exports.delete = async (req, res) => {
   try {
     // Lưu thông tin người xóa

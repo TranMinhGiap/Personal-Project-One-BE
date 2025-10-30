@@ -19,6 +19,21 @@ module.exports.create = (req, res, next) => {
   next();
 }
 
+module.exports.edit = (req, res, next) => {
+  if(!req.body){
+    return sendErrorHelper.sendError(res, 400, "Chưa có dữ liệu gửi lên !");
+  }
+  // Email
+  if(!req.body.email){
+    return sendErrorHelper.sendError(res, 400, "Yêu cầu nhập email !");
+  }
+  // fullName
+  if(!req.body.fullName){
+    return sendErrorHelper.sendError(res, 400, "Yêu cầu nhập họ và tên !");
+  }
+  next();
+}
+
 module.exports.changeMulti = (req, res, next) => {
   if(!req.body){
     return sendErrorHelper.sendError(res, 400, "Chưa có dữ liệu !");
