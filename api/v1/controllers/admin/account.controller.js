@@ -20,7 +20,7 @@ module.exports.index = async (req, res) => {
     // Search
     if(keyword){
       const regKeyword = searchHelper(keyword);
-      condition.title = regKeyword;
+      condition.fullName = regKeyword;
     }
     // Sort
     const sort = {};
