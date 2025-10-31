@@ -245,6 +245,15 @@ module.exports.detail = async (req, res) => {
     }
     // Có tài khoản thì gán thêm 1 số thông tin (User thêm sửa xóa)
     const newRecord = await userLogHelper(record);
+    // Gán thông tin role
+    if (newRecord.role_id) {
+      const role = await Role.findOne({ _id: newRecord.role_id, status: "active", deleted: false }).lean().select("title");
+      if (role) {
+        newRecord.roleInfo = role;
+      } else{
+        newRecord.roleInfo = null;
+      }
+    }
     res.json({
       success: true,
       status: 200,

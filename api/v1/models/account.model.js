@@ -20,6 +20,11 @@ const accountSchema = new mongoose.Schema(
       required: true,
       trim: true
     },
+    hometown: {
+      type: String,
+      default: "",
+      trim: true
+    },
     token: {
       type: String,
       default: () => generate.generateRandomString(30)
