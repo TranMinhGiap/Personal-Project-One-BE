@@ -3,6 +3,7 @@ const ProductVariant = require('../../models/product-variant.model');
 const sendErrorHelper = require('../../../../helpers/sendError.helper');
 const paginationHelper = require("../../../../helpers/objectPagination.helper");
 const searchHelper = require("../../../../helpers/search");
+const mongoose = require("mongoose");
 
 // [GET] /api/v1/admin/products
 module.exports.index = async (req, res) => {
@@ -67,6 +68,58 @@ module.exports.index = async (req, res) => {
       message: "Lấy dữ liệu thành công !",
       data: newRecords,
       pagination: objectPagination
+    });
+  } catch (error) {
+    sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);
+  }
+}
+
+// [POST] /api/v1/admin/products/create
+module.exports.create = async (req, res) => {
+  const { variants, ...productGeneral } = req.body;
+  try {
+    // Nếu không có vị trí => tự động tăng theo số lượng bản khi. Ngược lại có vị trí => Chuyển dạng số và giữ nguyên vị trí
+    if (!productGeneral.position) {
+      const count = await Product.countDocuments();
+      productGeneral.position = count + 1;
+    } else {
+      productGeneral.position = parseInt(productGeneral.position);
+    }
+    // Lưu thông tin người tạo (thông tin đã có khi chạy qua middleware auth)
+    productGeneral.createdBy = {
+      account_id: req.user.id
+    }
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    const record = new Product(productGeneral);
+    try {
+      await record.save({ session });
+
+      // Kiểm tra biến thể
+      await Promise.all(
+        (variants || []).map(v => {
+          const variant = new ProductVariant({
+            ...v,
+            product_id: record._id,
+            createdBy: { account_id: req.user.id }
+          });
+          return variant.save({ session });
+        })
+      );
+      await session.commitTransaction();
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+    
+    res.json({
+      success: true,
+      status: 200,
+      message: "Thêm sản phẩm thành công !",
+      data: record
     });
   } catch (error) {
     sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);

@@ -23,6 +23,10 @@ const productVariantSchema = new mongoose.Schema(
       required: true,
       default: 0 
     },
+    visits: { 
+      type: Number,
+      default: 0 
+    },
     storage: { 
       type: String, 
       required: true

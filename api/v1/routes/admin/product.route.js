@@ -12,4 +12,6 @@ const checkRoleMiddleware = require('../../middlewares/admin/auth.middleware');
 
 router.get('/', checkRoleMiddleware.checkRole('products_view'), controller.index)
 
+router.post('/create', checkRoleMiddleware.checkRole('products_create'), validate.create, controller.create)
+
 module.exports = router;

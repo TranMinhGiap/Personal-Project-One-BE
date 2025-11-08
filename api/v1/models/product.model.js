@@ -47,6 +47,10 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
+    featured: {
+      type: Boolean,
+      default: false
+    },
     deletedBy: {
       account_id: { 
         type: mongoose.Schema.Types.ObjectId, 
