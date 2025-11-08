@@ -4,6 +4,7 @@ const accountRoutes = require('./account.route');
 const myAccountRoutes = require('./my-account.route');
 const uploadCloudRoutes = require('./upload-cloud');
 const roleRoutes = require('./role.route');
+const productRoutes = require('./product.route');
 
 const authMiddleware = require('../../middlewares/admin/auth.middleware')
 
@@ -13,6 +14,8 @@ module.exports = (app) => {
   app.use(version + '/auth', authRoutes)
 
   app.use(version + '/product-category', authMiddleware.requireAuth, productCategoryRoutes);
+  
+  app.use(version + '/products', authMiddleware.requireAuth, productRoutes);
 
   app.use(version + '/accounts', authMiddleware.requireAuth, accountRoutes);
 
