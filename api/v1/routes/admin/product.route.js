@@ -14,4 +14,6 @@ router.get('/', checkRoleMiddleware.checkRole('products_view'), controller.index
 
 router.post('/create', checkRoleMiddleware.checkRole('products_create'), validate.create, controller.create)
 
+router.patch('/change-status/:id', checkRoleMiddleware.checkRole('products_edit'), validate.changeStatus, controller.changeStatus)
+
 module.exports = router;

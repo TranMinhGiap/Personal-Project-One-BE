@@ -125,3 +125,29 @@ module.exports.create = async (req, res) => {
     sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);
   }
 }
+
+// [PATCH] /api/v1/admin/products/change-status/:id
+module.exports.changeStatus = async (req, res) => {
+  try {
+    // Lưu thong tin người cập nhật
+    const updatedBy = {
+      account_id: req.user.id,
+      updatedAt: new Date()
+    };
+    // Cập nhật
+    await Product.updateOne(
+      { _id: req.params.id },
+      {
+        status: req.body.status,
+        $push: { updatedBy: updatedBy }
+      }
+    )
+    res.json({
+      success: true,
+      status: 200,
+      message: "Cập nhật trạng thái sản phẩm thành công !",
+    });
+  } catch (error) {
+    sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);
+  }
+}
