@@ -234,7 +234,7 @@ module.exports.detail = async (req, res) => {
   try {
     const record = await ProductCategory.findOne({ _id: req.params.id, deleted: false }).lean();
     if(!record){
-      return sendErrorHelper.sendError(res, 400, "Không tìm thấy danh mục", error.message);
+      return sendErrorHelper.sendError(res, 400, "Không tìm thấy danh mục");
     }
     // Lấy danh mục cha
     if (record.parent_id) {
