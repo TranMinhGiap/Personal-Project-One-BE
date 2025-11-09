@@ -16,4 +16,6 @@ router.post('/create', checkRoleMiddleware.checkRole('products_create'), validat
 
 router.patch('/change-status/:id', checkRoleMiddleware.checkRole('products_edit'), validate.changeStatus, controller.changeStatus)
 
+router.patch('/change-position/:id', checkRoleMiddleware.checkRole('products_edit'), validate.changePosition, controller.changePosition)
+
 module.exports = router;

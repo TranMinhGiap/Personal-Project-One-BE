@@ -151,3 +151,31 @@ module.exports.changeStatus = async (req, res) => {
     sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);
   }
 }
+
+// [PATCH] /api/v1/admin/products/change-position/:id
+module.exports.changePosition = async (req, res) => {
+  try {
+    // convert vị trí thành số trong trường hợp là string
+    req.body.position = parseInt(req.body.position);
+    // Lưu thong tin người cập nhật
+    const updatedBy = {
+      account_id: req.user.id,
+      updatedAt: new Date()
+    };
+    // Cập nhật
+    await Product.updateOne(
+      { _id: req.params.id },
+      {
+        position: req.body.position,
+        $push: { updatedBy: updatedBy }
+      }
+    )
+    res.json({
+      success: true,
+      status: 200,
+      message: "Cập nhật vị trí sản phẩm thành công !",
+    });
+  } catch (error) {
+    sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);
+  }
+}
