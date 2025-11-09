@@ -65,3 +65,25 @@ module.exports.changePosition = (req, res, next) => {
   }
   next();
 }
+
+module.exports.changeMulti = (req, res, next) => {
+  if(!req.body){
+    return sendErrorHelper.sendError(res, 400, "Chưa có dữ liệu gửi lên !");
+  }
+  // nhận kiểm tra có ids hay không
+  if(!req.body.ids){
+    return sendErrorHelper.sendError(res, 400, "Chưa có sản phẩm muốn thay đổi !");
+  }
+  if(!Array.isArray(req.body.ids) || req.body.ids.length === 0){
+    return sendErrorHelper.sendError(res, 400, "Dữ liệu id sản phẩm không hợp lệ !");
+  }
+  // nhận kiểm tra có type hay không
+  if(!req.body.type){
+    return sendErrorHelper.sendError(res, 400, "Chưa có hành động thay đổi !");
+  }
+  // Nếu có type phải là 1 trong 3 giá trị "active" hoặc "inactive" hoặc "deleted-all"
+  if(!['active', 'inactive', 'deleted-all', "isFeatured", "notFeatured"].includes(req.body.type)){
+    return sendErrorHelper.sendError(res, 400, "Hành động không hợp lệ !");
+  }
+  next();
+}
