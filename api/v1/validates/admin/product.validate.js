@@ -41,6 +41,16 @@ module.exports.changeStatus = (req, res, next) => {
   next();
 }
 
+module.exports.changeFeatured = (req, res, next) => {
+  if(!req.body){
+    return sendErrorHelper.sendError(res, 400, "Chưa có dữ liệu gửi lên !");
+  }
+  if(![true, false].includes(req.body.featured)){
+    return sendErrorHelper.sendError(res, 400, "Giá trị cập nhật không hợp lệ !");
+  }
+  next();
+}
+
 module.exports.changePosition = (req, res, next) => {
   if(!req.body){
     return sendErrorHelper.sendError(res, 400, "Chưa có dữ liệu gửi lên !");
