@@ -52,11 +52,14 @@ const productSchema = new mongoose.Schema(
       default: false
     },
     deletedBy: {
-      account_id: { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "Account" 
+      type: {
+        account_id: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Account"
+        },
+        deletedAt: Date
       },
-      deletedAt: Date
+      default: null
     },
     updatedBy: [
       {

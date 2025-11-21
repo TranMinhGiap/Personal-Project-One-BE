@@ -260,3 +260,35 @@ module.exports.changeMulti = async (req, res) => {
     sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);
   }
 }
+
+// [GET] /api/v1/admin/products/detail/:id
+module.exports.detail = async (req, res) => {
+  try {
+    const { id } = req.params;
+    // Lấy thông tin sản phẩm dựa trên id
+    const product = await Product.findOne({ _id: id, deleted: false })
+      .populate("category_id", "title")
+      .populate("createdBy.account_id", "fullName")
+      .lean();
+    // Lấy variants của product
+    const variants = await ProductVariant.find({ product_id: id, deleted: false }).sort({ createdAt: 1 }).lean();
+    // Thêm 1 số thông tin
+    const totalStock = variants.reduce((sum, v) => sum + v.stock, 0);
+    const totalVisits = variants.reduce((sum, v) => sum + v.visits, 0);
+    res.json({
+      success: true,
+      status: 200,
+      message: "Hiển thị thông tin chi tiết sản phẩm thành công !",
+      data: {
+        ...product,
+        variants,
+        stats: {
+          totalStock,
+          totalVisits
+        },
+      }
+    });
+  } catch (error) {
+    sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);
+  }
+}
