@@ -12,4 +12,6 @@ const checkRoleMiddleware = require('../../middlewares/admin/auth.middleware');
 
 router.patch('/bulk-update', checkRoleMiddleware.checkRole('products_edit'), validate.edit, controller.edit)
 
+router.delete('/delete/:id', checkRoleMiddleware.checkRole('products_delete'), controller.delete)
+
 module.exports = router;

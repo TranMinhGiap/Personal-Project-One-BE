@@ -36,3 +36,25 @@ module.exports.edit = async (req, res) => {
   }
 };
 
+// [DELETE] /api/v1/admin/variants/delete/:id
+module.exports.delete = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const infoDelete = {
+      account_id: req.user.id,
+      deletedAt: new Date()
+    }
+
+    await ProductVariant.updateOne({ _id: id }, { deleted: true, deletedBy: infoDelete });
+
+    res.json({
+      success: true,
+      status: 200,
+      message: "Xóa biến thể sản phẩm thành công !",
+    });
+  } catch (error) {
+    sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);
+  }
+};
+
