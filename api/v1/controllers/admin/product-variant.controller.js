@@ -9,11 +9,12 @@ module.exports.create = async (req, res) => {
       account_id: req.user.id
     }
     console.log(req.body);
-    await ProductVariant.create(req.body);
+    const record = await ProductVariant.create(req.body);
     res.json({
       success: true,
       status: 200,
       message: "Thêm mới biến thể thành công !",
+      data: record
     });
   } catch (error) {
     sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);
