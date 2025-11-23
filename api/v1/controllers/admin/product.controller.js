@@ -261,6 +261,49 @@ module.exports.changeMulti = async (req, res) => {
   }
 }
 
+// [DELETE] /api/v1/admin/products/delete/:id
+module.exports.delete = async (req, res) => {
+  try {
+    const { id } = req.params;
+    // Tìm sản phẩm cần xóa
+    const record = await Product.findOne({ _id: id, deleted: false });
+    if(!record){
+      return sendErrorHelper.sendError(res, 404, "Sản phẩm không tồn tại hoặc đã bị xóa");
+    }
+    // Lưu thông tin người xóa
+    const infoDelete = {
+      account_id: req.user.id,
+      deletedAt: new Date()
+    }
+    // xóa mềm
+    record.deleted = true;
+    record.deletedBy = infoDelete;
+    await record.save();
+    // Xóa biến thể liên quan
+    const variants = await ProductVariant.find({ product_id: id, deleted: false });
+    if(variants.length > 0){
+      await ProductVariant.updateMany(
+        { _id: { $in: variants.map(v => v._id) } },
+        {
+          deleted: true,
+          deletedBy: infoDelete
+        }
+      );
+    }
+    res.json({
+      success: true,
+      status: 200,
+      message: "Xóa sản phẩm thành công !",
+      data: { // Bonus: trả về số variant bị xóa (hữu ích cho FE)
+        productId: id,
+        variantsDeletedCount: variants.length
+      }
+    });
+  } catch (error) {
+    sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);
+  }
+}
+
 // [GET] /api/v1/admin/products/detail/:id
 module.exports.detail = async (req, res) => {
   try {

@@ -22,6 +22,8 @@ router.patch('/change-position/:id', checkRoleMiddleware.checkRole('products_edi
 
 router.patch('/change-multi', checkRoleMiddleware.checkRole('products_edit'), validate.changeMulti, controller.changeMulti)
 
+router.delete('/delete/:id', checkRoleMiddleware.checkRole('products_delete'), controller.delete)
+
 router.get('/detail/:id', checkRoleMiddleware.checkRole('products_view'), controller.detail)
 
 module.exports = router;
