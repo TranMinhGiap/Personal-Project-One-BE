@@ -1,6 +1,24 @@
 const ProductVariant = require('../../models/product-variant.model');
 const sendErrorHelper = require('../../../../helpers/sendError.helper');
 
+// [POST] /api/v1/admin/variants/create
+module.exports.create = async (req, res) => {
+  try {
+    // Thông tin người tạo
+    req.body.createdBy = {
+      account_id: req.user.id
+    }
+    console.log(req.body);
+    await ProductVariant.create(req.body);
+    res.json({
+      success: true,
+      status: 200,
+      message: "Thêm mới biến thể thành công !",
+    });
+  } catch (error) {
+    sendErrorHelper.sendError(res, 500, "Lỗi server", error.message);
+  }
+};
 // [PATCH] /api/v1/admin/variants/bulk-update
 module.exports.edit = async (req, res) => {
   try {
